@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webpage Designer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+        }
+
+        .editor-container {
+            display: flex;
+            width: 100%;
+            height: 50%;
+        }
+
+        .editor {
+            flex: 1;
+            margin: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            font-family: monospace;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            resize: none;
+            white-space: nowrap;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+
+        }
+
+        #preview {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ccc;
+            margin: 10px 0;
+            overflow: auto;
+            background-color: rgba(255, 255, 255, 1);
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        #preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Webpage Designer</h2>
+
+    <input type="button" id="download-button" value="Download Code" />
+
+    <div class="editor-container">
+        <div class="editor">
+            <h3>HTML</h3>
+            <textarea id="html-code" placeholder="<!-- HTML Code Goes Here -->"></textarea>
+        </div>
+        <div class="editor">
+            <h3>CSS</h3>
+            <textarea id="css-code" placeholder="/* CSS Goes Here */"></textarea>
+        </div>
+        <div class="editor">
+            <h3>JavaScript</h3>
+            <textarea id="js-code" placeholder="// JS code Goes Here"></textarea>
+        </div>
+    </div>
+    <div id="preview">
+        <iframe id="preview-iframe"></iframe>
+    </div>
+
+    <script>
+
+    	document.getElementById("html-code").value = localStorage.getItem("html");
+    	document.getElementById("css-code").value = localStorage.getItem("css");
+    	document.getElementById("js-code").value = localStorage.getItem("js");
+    	updatePreview();
+
+        function updatePreview() {
+            const htmlCode = document.getElementById("html-code").value;
+            const cssCode = "<style>" + document.getElementById("css-code").value + "</style>";
+            const jsCode = "<script>" + document.getElementById("js-code").value + "<\/script>";
+
+            const iframe = document.getElementById("preview-iframe");
+            const previewDocument = iframe.contentDocument || iframe.contentWindow.document;
+
+            previewDocument.open();
+            previewDocument.write(htmlCode + cssCode + jsCode);
+            previewDocument.close();
+
+            localStorage.setItem("html", document.getElementById("html-code").value);
+            localStorage.setItem("css", document.getElementById("css-code").value);
+            localStorage.setItem("js", document.getElementById("js-code").value);
+
+        }
+
+        function downloadCode() {
+			// Function to download the code as an HTML file
+            const htmlContent = document.getElementById("html-code").value;
+            const cssContent = document.getElementById("css-code").value;
+            const jsContent = document.getElementById("js-code").value;
+
+            // Full HTML content
+            const completeCode = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Downloaded Page</title>
+    <style>
+        ${cssContent}
+    </style>
+</head>
+<body>
+    ${htmlContent}
+    <script>
+        ${jsContent}
+    <\/script>
+</body>
+</html>`;
+
+            // Create a blob of the code
+            const blob = new Blob([completeCode], { type: 'text/html' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'webpage.html'; // Name of the downloaded file
+            link.click();
+        }
+
+        document.getElementById("html-code").addEventListener("input", updatePreview);
+        document.getElementById("css-code").addEventListener("input", updatePreview);
+        document.getElementById("js-code").addEventListener("input", updatePreview);
+        document.getElementById("download-button").addEventListener("click", downloadCode);
+    </script>
+
+</body>
+</html>
